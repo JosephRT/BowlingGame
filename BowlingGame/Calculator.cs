@@ -2,7 +2,9 @@
 {
     class Calculator
     {
-        private int[] rolls;
+        private readonly int[] rolls;
+        private const int BowlingGameFrames = 10;
+        private const int MaxPinsPerFrame = 10;
 
         private Calculator(int[] rolls)
         {
@@ -16,24 +18,44 @@
 
         public void GetScoreForAllRollsInGame(ref int score)
         {
-            int i = 0;
+            var currentRoll = 0;
 
-            for (int f = 0; f < 10; f++)
+            for (var currentFrame = 0; currentFrame < BowlingGameFrames; currentFrame++)
             {
-                // spares
-                if (rolls[i] + rolls[i + 1] == 10)
+                var currentRollsPins = rolls[currentRoll];
+                var nextRollsPins = rolls[currentRoll + 1];
+                var rollAfterNextPins = rolls[currentRoll + 2];
+
+                var frameIsAStrike = currentRollsPins == MaxPinsPerFrame;
+                var frameIsASpare = !frameIsAStrike && (currentRollsPins + nextRollsPins) == MaxPinsPerFrame;
+
+                if (frameIsAStrike)
                 {
-                    score += 10 + rolls[i + 2];
-                    i++;
+                    score += CalculateStrikeScore(currentRollsPins, nextRollsPins, rollAfterNextPins);
+                }
+                else if (frameIsASpare)
+                {
+                    score += CalculateSpareScore(rollAfterNextPins);
+                    currentRoll++;
                 }
                 else
                 {
-                    score += rolls[i] + rolls[i + 1];
-                    i++;
+                    score += currentRollsPins + nextRollsPins;
+                    currentRoll++;
                 }
 
-                i++;
+                currentRoll++;
             }
+        }
+
+        private static int CalculateStrikeScore(int currentRollsPins, int nextRollsPins, int rollAfterNextPins)
+        {
+            return currentRollsPins + nextRollsPins + rollAfterNextPins;
+        }
+
+        private static int CalculateSpareScore(int rollAfterNextsPins)
+        {
+            return MaxPinsPerFrame + rollAfterNextsPins;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.CodeDom;
+using System.Configuration;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Namespace_1;
 
 namespace BowlingGameTests
@@ -43,6 +45,60 @@ namespace BowlingGameTests
                 game.Roll(0);
 
             Assert.AreEqual(16, game.Score());
+        }
+
+        [TestMethod]
+        public void PerfectGame()
+        {
+            for (var currentRoll = 0; currentRoll < 12; currentRoll++)
+            {
+                game.Roll(10);
+            }
+
+            Assert.AreEqual(300, game.Score());
+        }
+
+        [TestMethod]
+        public void AllGutterBallsExceptStrikesOnLastFrame()
+        {
+            for (var currentFrame = 0; currentFrame < 10; currentFrame++)
+            {
+                var isNotLastFrame = currentFrame < 9;
+
+                if (isNotLastFrame)
+                {
+                    game.Roll(0);
+                    game.Roll(0);
+                }
+                else
+                {
+                    game.Roll(10);
+                    game.Roll(10);
+                    game.Roll(10);
+                }
+            }
+
+            Assert.AreEqual(30, game.Score());
+        }
+
+        [TestMethod]
+        public void StrikeThenSpareThenGutters()
+        {
+            game.Roll(10);
+            game.Roll(5);
+            game.Roll(5);
+
+            Assert.AreEqual(30, game.Score());
+        }
+
+        [TestMethod]
+        public void SpareThenStrikeThenGutters()
+        {
+            game.Roll(5);
+            game.Roll(5);
+            game.Roll(10);
+
+            Assert.AreEqual(30, game.Score());
         }
     }
 }
